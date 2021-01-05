@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Al Muwahhid Player</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Al Muwahhid Player</string>
+    <string name="nav_header_subtitle">Extended functional player for micro sd murottal</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_favourite">Favourite List</string>
+
+
+    <string name="share_title">Al Muwahhid Player</string>
+    <string name="share_body_template">Al Muwahhid Player\nextended functional player for micro sd murottals\n\nsilakan unduh di play store\n\nhttps://play.google.com/store/apps/details?id=com.ahsailabs.almuwahhidplayer</string>
+    <string name="feedback_mail_to">ahsai001@gmail.com</string>
+    <string name="feedback_title">Feedback for Al Muwahhid player</string>
+    <string name="feedback_body_template"></string>
+</resources>
