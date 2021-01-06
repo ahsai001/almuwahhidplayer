@@ -2,18 +2,16 @@ package com.ahsailabs.almuwahhidplayer.cores;
 
 import android.content.Context;
 
+import com.ahsailabs.alcore.api.APIConstant;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.models.FavouriteModel;
+import com.ahsailabs.alutils.PrefsData;
 import com.ahsailabs.sqlitewrapper.Lookup;
 import com.ahsailabs.sqlitewrapper.SQLiteWrapper;
-import com.zaitunlabs.zlcore.api.APIConstant ;
 
 public class BaseApplication extends com.zaitunlabs.zlcore.core.BaseApplication {
     public static final String DATABASE_NAME = "qudsplayer.db";
     @Override
     public void onCreate() {
-        APIConstant.setApiAppid("4");
-        APIConstant.setApiKey("1321ffgfsdfsdfsgweegfdsgdf");
-        APIConstant.setApiVersion("v1");
         super.onCreate();
 
         SQLiteWrapper.addDatabase(new SQLiteWrapper.Database() {
@@ -46,5 +44,11 @@ public class BaseApplication extends com.zaitunlabs.zlcore.core.BaseApplication 
         });
 
         Lookup.init(this, true);
+
+
+        APIConstant.setApiAppid("6");
+        //APIConstant.setApiKey("1321ffgfsdfsdfsgweegfdsgdf");
+        PrefsData.setApiKey("312555553fserewrwer5435fs");
+        APIConstant.setApiVersion("v1");
     }
 }

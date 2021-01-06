@@ -6,10 +6,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.ahsailabs.alcore.core.BaseRecyclerViewAdapter;
 import com.ahsailabs.almuwahhidplayer.R;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.models.FavouriteModel;
-import com.zaitunlabs.zlcore.core.BaseRecyclerViewAdapter;
-import com.zaitunlabs.zlcore.utils.CommonUtil;
+import com.ahsailabs.alutils.CommonUtil;
 
 import java.util.List;
 

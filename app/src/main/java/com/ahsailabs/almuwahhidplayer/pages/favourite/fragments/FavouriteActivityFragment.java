@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 
+import com.ahsailabs.alcore.core.BaseFragment;
+import com.ahsailabs.alcore.core.BaseRecyclerViewAdapter;
+import com.ahsailabs.alcore.views.CustomRecylerView;
 import com.ahsailabs.almuwahhidplayer.R;
 import com.ahsailabs.almuwahhidplayer.events.FavFABEvent;
 import com.ahsailabs.almuwahhidplayer.events.PlayThisEvent;
@@ -18,6 +21,10 @@ import com.ahsailabs.almuwahhidplayer.events.PlayThisListEvent;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.FavouriteActivity;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.adapters.FavouriteAdapter;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.models.FavouriteModel;
+import com.ahsailabs.alutils.CommonUtil;
+import com.ahsailabs.alutils.EventsUtil;
+import com.ahsailabs.alutils.SwipeRefreshLayoutUtil;
+import com.ahsailabs.alutils.ViewBindingUtil;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,13 +33,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.labo.kaji.fragmentanimations.MoveAnimation;
-import com.zaitunlabs.zlcore.core.BaseFragment;
-import com.zaitunlabs.zlcore.core.BaseRecyclerViewAdapter;
-import com.zaitunlabs.zlcore.utils.CommonUtil;
-import com.zaitunlabs.zlcore.utils.EventsUtil;
-import com.zaitunlabs.zlcore.utils.SwipeRefreshLayoutUtil;
-import com.zaitunlabs.zlcore.utils.ViewBindingUtil;
-import com.zaitunlabs.zlcore.views.CustomRecylerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -117,7 +117,7 @@ public class FavouriteActivityFragment extends BaseFragment {
             }
         });
 
-        CustomRecylerView recylerView = viewBindingUtil.getCustomRecylerView(R.id.favourite_recylerView);
+        CustomRecylerView recylerView = (CustomRecylerView) viewBindingUtil.getViewWithId(R.id.favourite_recylerView);
         recylerView.init();
         recylerView.setEmptyView(viewBindingUtil.getViewWithId(R.id.favourite_empty_view));
         recylerView.setAdapter(favouriteAdapter);
@@ -138,7 +138,7 @@ public class FavouriteActivityFragment extends BaseFragment {
 
         swipeRefreshLayoutUtil.refreshNow();
         ((FavouriteActivity)getActivity()).fab.setVisibility(View.VISIBLE);
-        ((FavouriteActivity) getActivity()).getSupportActionBar().setTitle(playlistName);
+        ((FavouriteActivity)getActivity()).getSupportActionBar().setTitle(playlistName);
     }
 
     private void loadQudsQidsIndexList(){

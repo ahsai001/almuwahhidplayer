@@ -8,10 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ahsailabs.alcore.core.BaseActivity;
+import com.ahsailabs.alcore.core.BaseFragment;
+import com.ahsailabs.alcore.core.BaseRecyclerViewAdapter;
+import com.ahsailabs.alcore.views.CustomRecylerView;
 import com.ahsailabs.almuwahhidplayer.R;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.FavouriteActivity;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.adapters.FavouritePlayListAdapter;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.models.FavouriteModel;
+import com.ahsailabs.alutils.SwipeRefreshLayoutUtil;
+import com.ahsailabs.alutils.ViewBindingUtil;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -19,12 +25,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.zaitunlabs.zlcore.core.BaseActivity;
-import com.zaitunlabs.zlcore.core.BaseFragment;
-import com.zaitunlabs.zlcore.core.BaseRecyclerViewAdapter;
-import com.zaitunlabs.zlcore.utils.SwipeRefreshLayoutUtil;
-import com.zaitunlabs.zlcore.utils.ViewBindingUtil;
-import com.zaitunlabs.zlcore.views.CustomRecylerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
             }
         });
 
-        CustomRecylerView recylerView = viewBindingUtil.getCustomRecylerView(R.id.favourite_recylerView);
+        CustomRecylerView recylerView = (CustomRecylerView) viewBindingUtil.getViewWithId(R.id.favourite_recylerView);
         recylerView.init();
         recylerView.setEmptyView(viewBindingUtil.getViewWithId(R.id.favourite_empty_view));
         recylerView.setAdapter(favouriteAdapter);

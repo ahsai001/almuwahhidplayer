@@ -13,6 +13,20 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import androidx.annotation.NonNull;
+
+import com.ahsailabs.alcore.activities.MessageListActivity;
+import com.ahsailabs.alcore.api.APIConstant;
+import com.ahsailabs.alcore.core.BaseActivity;
+import com.ahsailabs.alcore.core.WebViewActivity;
+import com.ahsailabs.alcore.events.InfoCounterEvent;
+import com.ahsailabs.alcore.services.FCMIntentService;
+import com.ahsailabs.alcore.tables.InformationModel;
+import com.ahsailabs.alutils.CommonUtil;
+import com.ahsailabs.alutils.EventsUtil;
+import com.ahsailabs.alutils.HttpClientUtil;
+import com.ahsailabs.alutils.PermissionUtil;
+import com.ahsailabs.alutils.ViewBindingUtil;
+import com.ahsailabs.alutils.ViewUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
@@ -46,20 +60,8 @@ import com.ahsailabs.almuwahhidplayer.pages.favourite.models.FavouriteModel;
 import com.ahsailabs.almuwahhidplayer.views.TextInputAutoCompleteTextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.zaitunlabs.zlcore.activities.AppListActivity;
-import com.zaitunlabs.zlcore.activities.MessageListActivity;
 import com.zaitunlabs.zlcore.activities.StoreActivity;
-import com.zaitunlabs.zlcore.api.APIConstant;
-import com.zaitunlabs.zlcore.core.BaseActivity;
-import com.zaitunlabs.zlcore.core.WebViewActivity;
-import com.zaitunlabs.zlcore.events.InfoCounterEvent;
 import com.zaitunlabs.zlcore.modules.about.AboutUs;
-import com.zaitunlabs.zlcore.services.FCMIntentService;
-import com.zaitunlabs.zlcore.tables.InformationModel;
-import com.zaitunlabs.zlcore.utils.CommonUtil;
-import com.zaitunlabs.zlcore.utils.EventsUtil;
-import com.zaitunlabs.zlcore.utils.PermissionUtil;
-import com.zaitunlabs.zlcore.utils.ViewBindingUtil;
-import com.zaitunlabs.zlcore.utils.ViewUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 
@@ -170,7 +172,7 @@ public class MainActivity extends BaseActivity
                                         publishProgress();
 
                                         if(listFile[i].length()/1024 <= 1) {
-                                            Log.e("audio OK fileName " + (x + 1), fileName);
+                                            //Log.e("audio OK fileName " + (x + 1), fileName);
                                             //Log.e("audio OK pathName " + (x + 1), pathName);
                                             x++;
                                         }
@@ -711,7 +713,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        FCMIntentService.startSending(MainActivity.this,APIConstant.API_APPID,false, false);
+        FCMIntentService.startSending(MainActivity.this, APIConstant.API_APPID,false, false, HttpClientUtil.AuthType.APIKEY);
     }
 
     @Subscribe
