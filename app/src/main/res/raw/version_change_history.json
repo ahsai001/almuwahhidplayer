@@ -1,5 +1,9 @@
 [
     {
+        "item": "version 1.1.6.22",
+        "description": "- bug fixing in fav list"
+    },
+    {
         "item": "version 1.1.5.21",
         "description": "- update title of fav list"
     },{

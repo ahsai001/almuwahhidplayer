@@ -4,6 +4,9 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +52,30 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
 
         favouriteModelList = new ArrayList<>();
         favouriteAdapter = new FavouritePlayListAdapter(favouriteModelList);
+
+        favouriteAdapter.addOnChildViewClickListener(new BaseRecyclerViewAdapter.OnChildViewClickListener() {
+            @Override
+            public void onClick(View view, Object o, int i) {
+                FavouriteModel selectedItem = (FavouriteModel)o;
+                FavouriteActivityFragment nextFragment = (FavouriteActivityFragment) getActivity().getSupportFragmentManager().findFragmentByTag("favlist");
+                if(nextFragment == null){
+                    nextFragment = new FavouriteActivityFragment();
+                }
+                nextFragment.setPlayListName(selectedItem.getPlaylist()).saveAsArgument();
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction
+                        .replace(R.id.fragment,nextFragment,"favlist").addToBackStack("favlist").commit();
+
+                manager.executePendingTransactions();
+
+            }
+
+            @Override
+            public void onLongClick(View view, Object dataModel, int position) {
+
+            }
+        });
     }
 
     @Override
@@ -68,11 +95,6 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewBindingUtil = ViewBindingUtil.initWithParentView(view);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         swipeRefreshLayoutUtil = SwipeRefreshLayoutUtil.init(viewBindingUtil.getSwipeRefreshLayout(R.id.favourite_refreshLayout), new Runnable() {
             @Override
             public void run() {
@@ -84,25 +106,13 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
         recylerView.init();
         recylerView.setEmptyView(viewBindingUtil.getViewWithId(R.id.favourite_empty_view));
         recylerView.setAdapter(favouriteAdapter);
-
-        favouriteAdapter.addOnChildViewClickListener(new BaseRecyclerViewAdapter.OnChildViewClickListener() {
-            @Override
-            public void onClick(View view, Object o, int i) {
-                FavouriteModel selectedItem = (FavouriteModel)o;
-                FavouriteActivityFragment nextFragment = new FavouriteActivityFragment();
-                nextFragment.setPlayListName(selectedItem.getPlaylist()).saveAsArgument();
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment,nextFragment,"favlist").addToBackStack("showlist").commit();
-            }
-
-            @Override
-            public void onLongClick(View view, Object dataModel, int position) {
-
-            }
-        });
-
         swipeRefreshLayoutUtil.refreshNow();
         ((FavouriteActivity)getActivity()).fab.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
 

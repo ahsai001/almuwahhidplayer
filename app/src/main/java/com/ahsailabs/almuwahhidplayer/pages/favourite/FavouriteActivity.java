@@ -28,7 +28,7 @@ public class FavouriteActivity extends BaseActivity {
 
         enableUpNavigation();
 
-        showFragment(R.id.fragment,FavouritePlayListActivityFragment.class,null, null,"playlist");
+        showFragment(R.id.fragment,FavouritePlayListActivityFragment.class,null, null,null);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -37,12 +37,20 @@ public class FavouriteActivity extends BaseActivity {
                 EventBus.getDefault().post(new FavFABEvent());
             }
         });
+
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
-            onBackPressed();
+            int count = getSupportFragmentManager().getBackStackEntryCount();
+            if (count > 0){
+                getSupportFragmentManager().popBackStack();
+            } else {
+                onBackPressed();
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
