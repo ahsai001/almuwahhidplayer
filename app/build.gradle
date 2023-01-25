@@ -48,7 +48,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     //implementation project(':zlcore')
-    implementation 'com.github.ahsai001:alcore:1.13.103.286'
+    implementation 'com.github.ahsai001:alcore:1.13.104.288'
     implementation 'com.github.ahsai001.SQLiteWrapper:Core:0.6.17.16'
     implementation 'com.github.ahsai001.SQLiteWrapper:Annotation:0.6.17.16'
     annotationProcessor 'com.github.ahsai001.SQLiteWrapper:Processor:0.6.17.16'

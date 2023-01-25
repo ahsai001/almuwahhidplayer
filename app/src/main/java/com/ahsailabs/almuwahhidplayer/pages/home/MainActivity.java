@@ -43,11 +43,13 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,9 +77,16 @@ import java.util.Set;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    List<String> fileNameList = new ArrayList<>();
-    List<String> filePathList = new ArrayList<>();
-    HashMap<String, String> fileMap = new HashMap<>();
+
+    List<String> folderNameList = new ArrayList<>();
+    HashMap<String, List<String>> fileNameListMap = new HashMap<>();
+    HashMap<String, List<String>> filePathListMap = new HashMap<>();
+    HashMap<String, HashMap<String, String>> fileMapMap = new HashMap<>();
+    String selectedFolder = "";
+
+    //List<String> fileNameList = new ArrayList<>();
+    //List<String> filePathList = new ArrayList<>();
+    //HashMap<String, String> fileMap = new HashMap<>(); //filename : pathname
 
     TextView statusTextView;
     TextView numberTextView;
@@ -155,19 +164,33 @@ public class MainActivity extends BaseActivity
                         int x = 0;
                         if (listFile != null) {
                             for (int i = 0; i < listFile.length; i++) {
+
                                 if (listFile[i].isDirectory()) {
                                     walkDir(listFile[i]);
                                 } else {
                                     String fileName = listFile[i].getName();
                                     String pathName = listFile[i].getPath();
                                     if (fileName.endsWith(".mp3") || fileName.endsWith(".MP3") || fileName.endsWith(".wma")) {
+
+                                        String folderName = pathName.replace(fileName, "");
+                                        Log.e("ahmad folder", folderName);
+
+                                        if(!folderNameList.contains(folderName)){
+                                            //create new listing
+                                            folderNameList.add(folderName);
+                                            fileNameListMap.put(folderName, new ArrayList<>());
+                                            filePathListMap.put(folderName, new ArrayList<>());
+                                            fileMapMap.put(folderName, new HashMap<>());
+                                        }
+
+
                                         //remove extension
                                         fileName = fileName.replace(".mp3","").replace(".MP3","").replace(".wma","");
 
-                                        fileMap.put(fileName, pathName);
 
-                                        fileNameList.add(fileName);
-                                        filePathList.add(pathName);
+                                        fileMapMap.get(folderName).put(fileName, pathName);
+                                        fileNameListMap.get(folderName).add(fileName);
+                                        filePathListMap.get(folderName).add(pathName);
 
                                         publishProgress();
 
@@ -176,6 +199,8 @@ public class MainActivity extends BaseActivity
                                             //Log.e("audio OK pathName " + (x + 1), pathName);
                                             x++;
                                         }
+                                        Log.e("ahmad audio OK fileName " + (i + 1), fileName);
+                                        Log.e("ahmad audio OK pathName " + (i + 1), pathName);
                                     } else {
                                         //Log.e("audio NOK fileName",fileName);
                                         //Log.e("audio NOK pathName",pathName);
@@ -213,6 +238,8 @@ public class MainActivity extends BaseActivity
                         super.onPostExecute(aVoid);
                         isScanning = false;
                         scanLoading.dismiss();
+
+                        setupSpinnerFolder();
                     }
                 }.execute());
             }
@@ -241,18 +268,18 @@ public class MainActivity extends BaseActivity
                     //do playing
                     int numberInt = Integer.parseInt(number);
 
-                    if(0 >= filePathList.size()){
+                    if(0 >= filePathListMap.get(selectedFolder).size()){
                         CommonUtil.showSnackBar(MainActivity.this, "Maaf, tidak ada audio yang terbaca");
                         return;
                     }
 
-                    if(numberInt-1 > filePathList.size()){
+                    if(numberInt-1 >= filePathListMap.get(selectedFolder).size()){
                         CommonUtil.showSnackBar(MainActivity.this, "Maaf, tidak ada audio pada nomor ini");
                         return;
                     }
 
-                    String fileName = fileNameList.get(numberInt-1);
-                    String filePath = filePathList.get(numberInt-1);
+                    String fileName = fileNameListMap.get(selectedFolder).get(numberInt-1);
+                    String filePath = filePathListMap.get(selectedFolder).get(numberInt-1);
                     if(filePath != null) {
                         playingNumber = numberInt;
 
@@ -271,6 +298,10 @@ public class MainActivity extends BaseActivity
                                                 playListIndex = 0;
                                             }
                                             nextNumber = favPlayList.get(playListIndex).getNumber();
+                                        } else {
+                                            if(playingNumber >= filePathListMap.get(selectedFolder).size()){
+                                                nextNumber = "1";
+                                            }
                                         }
                                         numberTextView.setText(nextNumber);
                                         playButton.callOnClick();
@@ -434,6 +465,10 @@ public class MainActivity extends BaseActivity
                         playListIndex = favPlayList.size()-1;
                     }
                     prevNumber = favPlayList.get(playListIndex).getNumber();
+                } else {
+                    if(playingNumber <= 1){
+                        prevNumber = String.valueOf(filePathListMap.get(selectedFolder).size());
+                    }
                 }
                 numberTextView.setText(prevNumber);
                 playButton.callOnClick();
@@ -466,6 +501,10 @@ public class MainActivity extends BaseActivity
                         playListIndex = 0;
                     }
                     nextNumber = favPlayList.get(playListIndex).getNumber();
+                } else {
+                    if(playingNumber >= filePathListMap.get(selectedFolder).size()){
+                        nextNumber = "1";
+                    }
                 }
                 numberTextView.setText(nextNumber);
                 playButton.callOnClick();
@@ -484,8 +523,8 @@ public class MainActivity extends BaseActivity
                     return;
                 }
 
-                final String fileName = fileNameList.get(playingNumber-1);
-                final String filePath = filePathList.get(playingNumber-1);
+                final String fileName = fileNameListMap.get(selectedFolder).get(playingNumber-1);
+                final String filePath = filePathListMap.get(selectedFolder).get(playingNumber-1);
 
                 if(filePath == null){
                     return;
@@ -602,6 +641,38 @@ public class MainActivity extends BaseActivity
         EventsUtil.register(this);
     }
 
+    private void setupSpinnerFolder() {
+        Spinner folderSpinner = (Spinner) viewBindingUtil.getViewWithId(R.id.spFolder);
+
+        ArrayAdapter ad
+                = new ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                folderNameList);
+        ad.setDropDownViewResource(
+                android.R.layout
+                        .simple_spinner_dropdown_item);
+
+        folderSpinner.setAdapter(ad);
+
+        folderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedFolder = folderNameList.get(position);
+                exitPlayList();
+                viewBindingUtil.getViewWithId(R.id.number_stop_textview).callOnClick();
+                numberTextView.setText("");
+                playingNumber = 0;
+                updateInfo();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
     private Handler mSeekBarHandler = new Handler();
     private Handler backForwardHandler = new Handler();
     public int mBackForwardValue;
@@ -626,7 +697,8 @@ public class MainActivity extends BaseActivity
     }
 
     private void updateInfo(){
-        String info = "Total : "+ filePathList.size();
+        if(TextUtils.isEmpty(selectedFolder)) return;
+        String info = "Total : "+ filePathListMap.get(selectedFolder).size();
         if(!TextUtils.isEmpty(repeatState)){
             info += "<br/>"+repeatState;
 
