@@ -50,12 +50,23 @@ public class FavouriteActivityFragment extends BaseFragment {
     FavouriteAdapter favouriteAdapter;
     List<FavouriteModel> favouriteModelList;
     String playlistName;
+    String playlistID;
+
+    String folderlistId;
+    String folderlistName;
     public FavouriteActivityFragment() {
     }
 
 
-    public FavouriteActivityFragment setPlayListName(String playListName){
-        getBundle().putString("playlist", playListName);
+    public FavouriteActivityFragment setPlayListName(String playListID, String playListName){
+        getBundle().putString("playlistId", playListID);
+        getBundle().putString("playlistName", playListName);
+        return this;
+    }
+
+    public FavouriteActivityFragment setFolderListName(String folderlistId, String folderlistName){
+        getBundle().putString("folderlistId", folderlistId);
+        getBundle().putString("folderlistName", folderlistName);
         return this;
     }
 
@@ -99,7 +110,10 @@ public class FavouriteActivityFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewBindingUtil = viewBindingUtil.initWithParentView(view);
-        playlistName = CommonUtil.getStringFragmentArgument(getArguments(),"playlist", "");
+        playlistID = CommonUtil.getStringFragmentArgument(getArguments(),"playlistId", "");
+        playlistName = CommonUtil.getStringFragmentArgument(getArguments(),"playlistName", "");
+        folderlistId = CommonUtil.getStringFragmentArgument(getArguments(),"folderlistId", "");
+        folderlistName = CommonUtil.getStringFragmentArgument(getArguments(),"folderlistName", "");
     }
 
     @Override
@@ -143,7 +157,7 @@ public class FavouriteActivityFragment extends BaseFragment {
 
     private void loadQudsQidsIndexList(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlistName).collection("list").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("cards/"+folderlistId+"/list/"+playlistID+"/list").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){

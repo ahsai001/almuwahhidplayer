@@ -19,6 +19,7 @@ import com.ahsailabs.almuwahhidplayer.R;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.FavouriteActivity;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.adapters.FavouritePlayListAdapter;
 import com.ahsailabs.almuwahhidplayer.pages.favourite.models.FavouriteModel;
+import com.ahsailabs.alutils.CommonUtil;
 import com.ahsailabs.alutils.SwipeRefreshLayoutUtil;
 import com.ahsailabs.alutils.ViewBindingUtil;
 import com.google.android.gms.tasks.OnCanceledListener;
@@ -41,7 +42,15 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
     SwipeRefreshLayoutUtil swipeRefreshLayoutUtil;
     FavouritePlayListAdapter favouriteAdapter;
     List<FavouriteModel> favouriteModelList;
+    String folderlistId;
+    String folderlistName;
     public FavouritePlayListActivityFragment() {
+    }
+
+    public FavouritePlayListActivityFragment setFolderListName(String folderlistId, String folderlistName){
+        getBundle().putString("folderlistId", folderlistId);
+        getBundle().putString("folderlistName", folderlistName);
+        return this;
     }
 
     @Override
@@ -61,7 +70,7 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
                 if(nextFragment == null){
                     nextFragment = new FavouriteActivityFragment();
                 }
-                nextFragment.setPlayListName(selectedItem.getPlaylist()).saveAsArgument();
+                nextFragment.setPlayListName(selectedItem.getPlaylist(), selectedItem.getPlaylistName()).setFolderListName(folderlistId, folderlistName).saveAsArgument();
                 FragmentManager manager = getActivity().getSupportFragmentManager();
                 FragmentTransaction transaction = manager.beginTransaction();
                 transaction
@@ -82,7 +91,7 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        ((BaseActivity)getActivity()).getSupportActionBar().setTitle("Play List");
+        ((BaseActivity)getActivity()).getSupportActionBar().setTitle(folderlistName+" Play List");
     }
 
     @Override
@@ -95,6 +104,8 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewBindingUtil = ViewBindingUtil.initWithParentView(view);
+        folderlistId = CommonUtil.getStringFragmentArgument(getArguments(),"folderlistId", "");
+        folderlistName = CommonUtil.getStringFragmentArgument(getArguments(),"folderlistName", "");
         swipeRefreshLayoutUtil = SwipeRefreshLayoutUtil.init(viewBindingUtil.getSwipeRefreshLayout(R.id.favourite_refreshLayout), new Runnable() {
             @Override
             public void run() {
@@ -119,7 +130,8 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
 
     private void loadCloudPlayList(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+        db.collection("cards/"+folderlistId+"/list").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 List<FavouriteModel> cloudPlayList = new ArrayList<>();
@@ -129,7 +141,7 @@ public class FavouritePlayListActivityFragment extends BaseFragment {
                         FavouriteModel item = new FavouriteModel();
                         String docName = snapshot.getId();
                         item.setPlaylist(docName);
-                        item.setName(docName);
+                        item.setPlaylistName(docName);
                         cloudPlayList.add(item);
                     }
                 }

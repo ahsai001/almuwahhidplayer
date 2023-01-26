@@ -30,7 +30,7 @@ public class FavouritePlayListAdapter extends BaseRecyclerViewAdapter<FavouriteM
 
     @Override
     protected void doSettingViewWithModel(FavouriteViewHolder favouriteViewHolder, FavouriteModel favouriteModel, int position) {
-        String playListName = favouriteModel.getPlaylist();
+        String playListName = favouriteModel.getPlaylistName();
         favouriteViewHolder.getNameView().setText(TextUtils.isEmpty(playListName)?"No Name":playListName);
         favouriteViewHolder.getFileNameView().setText("");
         setViewClickable(favouriteViewHolder,favouriteViewHolder.itemView);

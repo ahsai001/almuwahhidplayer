@@ -11,6 +11,7 @@ public class FavouriteModel extends SQLiteWrapper.TableClass {
     private String filename;
     private String pathname;
     private String playlist;
+    private String playlistname;
 
     public FavouriteModel(){
         super();
@@ -48,6 +49,14 @@ public class FavouriteModel extends SQLiteWrapper.TableClass {
         this.playlist = playlist;
     }
 
+    public String getPlaylistName() {
+        return playlistname;
+    }
+
+    public void setPlaylistName(String playlistname) {
+        this.playlistname = playlistname;
+    }
+
     public String getNumber() {
         return number;
     }
@@ -69,6 +78,7 @@ public class FavouriteModel extends SQLiteWrapper.TableClass {
         dataList.add(filename);
         dataList.add(pathname);
         dataList.add(playlist);
+        dataList.add(playlistname);
     }
 
     @Override
@@ -78,6 +88,7 @@ public class FavouriteModel extends SQLiteWrapper.TableClass {
         filename = (String) dataList.get(2);
         pathname = (String) dataList.get(3);
         playlist = (String) dataList.get(4);
+        playlistname = (String) dataList.get(5);
     }
 
 

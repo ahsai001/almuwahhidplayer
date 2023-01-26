@@ -29,6 +29,8 @@ import com.ahsailabs.alutils.ViewBindingUtil;
 import com.ahsailabs.alutils.ViewUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.content.ContextCompat;
+
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -74,6 +76,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -83,10 +88,6 @@ public class MainActivity extends BaseActivity
     HashMap<String, List<String>> filePathListMap = new HashMap<>();
     HashMap<String, HashMap<String, String>> fileMapMap = new HashMap<>();
     String selectedFolder = "";
-
-    //List<String> fileNameList = new ArrayList<>();
-    //List<String> filePathList = new ArrayList<>();
-    //HashMap<String, String> fileMap = new HashMap<>(); //filename : pathname
 
     TextView statusTextView;
     TextView numberTextView;
@@ -119,6 +120,63 @@ public class MainActivity extends BaseActivity
     private boolean isScanning = false;
 
     private Snackbar scanLoading = null;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private Handler handler = new Handler(Looper.getMainLooper());
+
+    public void walkDir(File dir) {
+
+        File[] listFile = dir.listFiles();
+
+        int x = 0;
+        if (listFile != null) {
+            for (int i = 0; i < listFile.length; i++) {
+
+                if (listFile[i].isDirectory()) {
+                    walkDir(listFile[i]);
+                } else {
+                    String fileName = listFile[i].getName();
+                    String pathName = listFile[i].getPath();
+                    if (fileName.endsWith(".mp3") || fileName.endsWith(".MP3") || fileName.endsWith(".wma")) {
+
+                        String folderName = pathName.replace(fileName, "");
+                        //Log.e("ahmad folder", folderName);
+
+                        if(!folderNameList.contains(folderName)){
+                            //create new listing
+                            folderNameList.add(folderName);
+                            fileNameListMap.put(folderName, new ArrayList<>());
+                            filePathListMap.put(folderName, new ArrayList<>());
+                            fileMapMap.put(folderName, new HashMap<>());
+                        }
+
+
+                        //remove extension
+                        fileName = fileName.replace(".mp3","").replace(".MP3","").replace(".wma","");
+
+
+                        fileMapMap.get(folderName).put(fileName, pathName);
+                        fileNameListMap.get(folderName).add(fileName);
+                        filePathListMap.get(folderName).add(pathName);
+
+                        //publishProgress();
+
+                        if(listFile[i].length()/1024 <= 1) {
+                            //Log.e("audio OK fileName " + (x + 1), fileName);
+                            //Log.e("audio OK pathName " + (x + 1), pathName);
+                            x++;
+                        }
+                        //Log.e("ahmad audio OK fileName " + (i + 1), fileName);
+                        //Log.e("ahmad audio OK pathName " + (i + 1), pathName);
+                    } else {
+                        //Log.e("audio NOK fileName",fileName);
+                        //Log.e("audio NOK pathName",pathName);
+                    }
+                }
+            }
+        }
+
+        //publishProgress();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +203,7 @@ public class MainActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setItemIconTintList(null);
 
-        viewBindingUtil = viewBindingUtil.initWithParentView(findViewById(android.R.id.content));
+        viewBindingUtil = ViewBindingUtil.initWithParentView(findViewById(android.R.id.content));
 
         statusTextView = findViewById(R.id.status_textview);
         numberTextView = findViewById(R.id.number_textview);
@@ -156,92 +214,23 @@ public class MainActivity extends BaseActivity
         permissionUtil = PermissionUtil.checkPermissionAndGo(MainActivity.this, 1053, new Runnable() {
             @Override
             public void run() {
-                addAsync(new AsyncTask<Void, Void, Void>() {
-                    public void walkDir(File dir) {
+                scanLoading = CommonUtil.showLoadingSnackBar(MainActivity.this, "Sedang membaca micro SD, harap bersabar");
+                isScanning = true;
 
-                        File[] listFile = dir.listFiles();
-
-                        int x = 0;
-                        if (listFile != null) {
-                            for (int i = 0; i < listFile.length; i++) {
-
-                                if (listFile[i].isDirectory()) {
-                                    walkDir(listFile[i]);
-                                } else {
-                                    String fileName = listFile[i].getName();
-                                    String pathName = listFile[i].getPath();
-                                    if (fileName.endsWith(".mp3") || fileName.endsWith(".MP3") || fileName.endsWith(".wma")) {
-
-                                        String folderName = pathName.replace(fileName, "");
-                                        Log.e("ahmad folder", folderName);
-
-                                        if(!folderNameList.contains(folderName)){
-                                            //create new listing
-                                            folderNameList.add(folderName);
-                                            fileNameListMap.put(folderName, new ArrayList<>());
-                                            filePathListMap.put(folderName, new ArrayList<>());
-                                            fileMapMap.put(folderName, new HashMap<>());
-                                        }
-
-
-                                        //remove extension
-                                        fileName = fileName.replace(".mp3","").replace(".MP3","").replace(".wma","");
-
-
-                                        fileMapMap.get(folderName).put(fileName, pathName);
-                                        fileNameListMap.get(folderName).add(fileName);
-                                        filePathListMap.get(folderName).add(pathName);
-
-                                        publishProgress();
-
-                                        if(listFile[i].length()/1024 <= 1) {
-                                            //Log.e("audio OK fileName " + (x + 1), fileName);
-                                            //Log.e("audio OK pathName " + (x + 1), pathName);
-                                            x++;
-                                        }
-                                        Log.e("ahmad audio OK fileName " + (i + 1), fileName);
-                                        Log.e("ahmad audio OK pathName " + (i + 1), pathName);
-                                    } else {
-                                        //Log.e("audio NOK fileName",fileName);
-                                        //Log.e("audio NOK pathName",pathName);
-                                    }
-                                }
-                            }
-                        }
-
-                        publishProgress();
+                executorService.execute(() -> {
+                    String[] sdCards = getStorageDirectories(MainActivity.this);
+                    if (sdCards.length > 0) {
+                        walkDir(new File(sdCards[0]));
                     }
 
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        scanLoading = CommonUtil.showLoadingSnackBar(MainActivity.this, "Sedang membaca micro SD, harap bersabar");
-                        isScanning = true;
-                    }
-
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        String[] sdCards = getStorageDirectories(MainActivity.this);
-                        if (sdCards.length > 0) {
-                            walkDir(new File(sdCards[0]));
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onProgressUpdate(Void... values) {
-                        updateInfo();
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
+                    handler.post(() -> {
                         isScanning = false;
                         scanLoading.dismiss();
 
                         setupSpinnerFolder();
-                    }
-                }.execute());
+                    });
+                });
+
             }
         }, new Runnable() {
             @Override
@@ -267,6 +256,10 @@ public class MainActivity extends BaseActivity
                 if(!TextUtils.isEmpty(number)){
                     //do playing
                     int numberInt = Integer.parseInt(number);
+                    if(selectedFolder.isEmpty()){
+                        CommonUtil.showSnackBar(MainActivity.this, "Maaf, harap menunggu scan selesai atau pastikan audio tersedia di sdcard anda");
+                        return;
+                    }
 
                     if(0 >= filePathListMap.get(selectedFolder).size()){
                         CommonUtil.showSnackBar(MainActivity.this, "Maaf, tidak ada audio yang terbaca");
@@ -299,7 +292,7 @@ public class MainActivity extends BaseActivity
                                             }
                                             nextNumber = favPlayList.get(playListIndex).getNumber();
                                         } else {
-                                            if(playingNumber >= filePathListMap.get(selectedFolder).size()){
+                                            if(!selectedFolder.isEmpty() && playingNumber >= filePathListMap.get(selectedFolder).size()){
                                                 nextNumber = "1";
                                             }
                                         }
@@ -502,7 +495,7 @@ public class MainActivity extends BaseActivity
                     }
                     nextNumber = favPlayList.get(playListIndex).getNumber();
                 } else {
-                    if(playingNumber >= filePathListMap.get(selectedFolder).size()){
+                    if(!selectedFolder.isEmpty() && playingNumber >= filePathListMap.get(selectedFolder).size()){
                         nextNumber = "1";
                     }
                 }
@@ -558,6 +551,7 @@ public class MainActivity extends BaseActivity
                                 FavouriteModel favouriteModel = new FavouriteModel();
                                 favouriteModel.setName(name);
                                 favouriteModel.setPlaylist(playlist);
+                                favouriteModel.setPlaylistName(playlist);
                                 //favouriteModel.setNumber(String.valueOf(playingNumber));
                                 favouriteModel.setNumber(fileName);
                                 favouriteModel.setFilename(fileName);

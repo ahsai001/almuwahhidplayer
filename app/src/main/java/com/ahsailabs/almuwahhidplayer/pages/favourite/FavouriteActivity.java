@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.ahsailabs.alcore.core.BaseActivity;
+import com.ahsailabs.almuwahhidplayer.pages.favourite.fragments.FavouriteFolderListActivityFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.widget.Toolbar;
@@ -13,7 +14,6 @@ import android.view.View;
 
 import com.ahsailabs.almuwahhidplayer.R;
 import com.ahsailabs.almuwahhidplayer.events.FavFABEvent;
-import com.ahsailabs.almuwahhidplayer.pages.favourite.fragments.FavouritePlayListActivityFragment;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -28,7 +28,7 @@ public class FavouriteActivity extends BaseActivity {
 
         enableUpNavigation();
 
-        showFragment(R.id.fragment,FavouritePlayListActivityFragment.class,null, null,null);
+        showFragment(R.id.fragment, FavouriteFolderListActivityFragment.class,null, null,null);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

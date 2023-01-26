@@ -38,6 +38,7 @@ public class BaseApplication extends com.zaitunlabs.zlcore.core.BaseApplication 
                         .addStringField("filename")
                         .addStringField("pathname")
                         .addStringField("playlist")
+                        .addStringField("playlistname")
                         .enableRecordLog()
                         .addIndex("playlist"));
             }
