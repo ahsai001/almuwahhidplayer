@@ -728,6 +728,8 @@ public class MainActivity extends BaseActivity
             FavouriteModel selectedItem = favPlayList.get(playListIndex);
             String title = selectedItem.getName()+" - "+selectedItem.getPlaylist();
             info += "<b>("+title+")</b>";
+        } else {
+
         }
 
 
