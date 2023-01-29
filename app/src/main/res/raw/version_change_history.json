@@ -1,5 +1,9 @@
 [
     {
+        "item": "version 1.2.7.25",
+        "description": "- support multiple folder list in sdcard"
+    },
+    {
         "item": "version 1.1.6.22",
         "description": "- bug fixing in fav list"
     },

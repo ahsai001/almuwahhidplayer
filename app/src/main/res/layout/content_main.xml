@@ -12,6 +12,10 @@
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selected audio folder : "/>
         <Spinner
             android:id="@+id/spFolder"
             android:layout_width="match_parent"
